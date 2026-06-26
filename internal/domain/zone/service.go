@@ -1,6 +1,9 @@
 package zone
 
-import "spot-sync/internal/domain/zone/dto"
+import (
+	"fmt"
+	"spot-sync/internal/domain/zone/dto"
+)
 
 type service struct {
 	repo Repository
@@ -23,4 +26,22 @@ func (s *service) CreateZone(req dto.CreateRequest) (*dto.ZoneResponse, error) {
 	}
 
 	return zone.toResponse(), nil
+}
+
+func (s *service) GetAllZones() ([]dto.ZoneResponse, error) {
+	zones, err := s.repo.GetAll()
+
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("Zones result", zones)
+
+	res := make([]dto.ZoneResponse, len(zones))
+
+	for i, zone := range zones {
+		res[i] = *zone.toResponse()
+	}
+
+	return res, nil
 }

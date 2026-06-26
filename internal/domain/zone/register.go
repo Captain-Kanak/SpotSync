@@ -11,4 +11,5 @@ func Routes(db *gorm.DB, api *echo.Group) {
 	handler := NewHandler(service)
 
 	api.POST("/zones", handler.CreateZone)
+	api.GET("/zones", handler.GetAllZones)
 }

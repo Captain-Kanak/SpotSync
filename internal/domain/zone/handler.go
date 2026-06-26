@@ -57,3 +57,22 @@ func (h *handler) CreateZone(c *echo.Context) error {
 		Data:    res,
 	})
 }
+
+func (h *handler) GetAllZones(c *echo.Context) error {
+	res, err := h.service.GetAllZones()
+
+	if err != nil {
+		fmt.Println(err)
+
+		return c.JSON(http.StatusBadRequest, httpresponse.Response{
+			Success: false,
+			Message: "Failed to get zones",
+		})
+	}
+
+	return c.JSON(http.StatusOK, httpresponse.Response{
+		Success: true,
+		Message: "Parking zones retrieved successfully",
+		Data:    res,
+	})
+}
