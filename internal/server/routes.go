@@ -10,20 +10,22 @@ import (
 )
 
 func Routes(e *echo.Echo, db *gorm.DB) {
-	db.Exec(`
-		DO $$
-		BEGIN
-    	IF NOT EXISTS (
-        	SELECT 1 FROM pg_type WHERE typname = 'user_role'
-    	) THEN
-        CREATE TYPE user_role AS ENUM (
-            'ADMIN',
-            'DRIVER'
-        );
-    	END IF;
-		END
-		$$;
-	`)
+	// (func() {
+	// 	db.Exec(`
+	// 		DO $$
+	// 		BEGIN
+	// 		IF NOT EXISTS (
+	// 	    	SELECT 1 FROM pg_type WHERE typname = 'user_role'
+	// 		) THEN
+	// 	    CREATE TYPE user_role AS ENUM (
+	// 	        'ADMIN',
+	// 	        'DRIVER'
+	// 	    );
+	// 		END IF;
+	// 		END
+	// 		$$;
+	// 	`)
+	// })()
 
 	db.AutoMigrate(&user.User{})
 
