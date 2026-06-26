@@ -42,7 +42,7 @@ func (s *service) LoginUser(req dto.LoginRequest) (*dto.LoginResponse, error) {
 		return nil, err
 	}
 
-	token, err := s.jwt.GenerateToken(user.Id, user.Name, user.Email)
+	token, err := s.jwt.GenerateToken(user.Id, user.Name, user.Email, string(user.Role))
 
 	if err != nil {
 		return nil, err

@@ -16,11 +16,12 @@ type JWTClaims struct {
 	Id    uuid.UUID `json:"id"`
 	Name  string    `json:"name"`
 	Email string    `json:"email"`
+	Role  string    `json:"role"`
 	jwt.RegisteredClaims
 }
 
 type JWTService interface {
-	GenerateToken(id uuid.UUID, name, email string) (string, error)
+	GenerateToken(id uuid.UUID, name, email, role string) (string, error)
 	ValidateToken(token string) (*JWTClaims, error)
 }
 
@@ -32,11 +33,12 @@ func NewJWTService(secretKey string) JWTService {
 	return &jwtService{secretKey}
 }
 
-func (j *jwtService) GenerateToken(id uuid.UUID, name, email string) (string, error) {
+func (j *jwtService) GenerateToken(id uuid.UUID, name, email, role string) (string, error) {
 	claims := JWTClaims{
 		Id:    id,
 		Name:  name,
 		Email: email,
+		Role:  role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    issuer,
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
