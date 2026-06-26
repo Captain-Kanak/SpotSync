@@ -28,6 +28,8 @@ func Start(env *config.Env, db *gorm.DB) {
 	e.Use(middleware.RequestLogger())
 	e.Validator = &CustomValidator{validator: validator.New()}
 
+	Routes(e, db)
+
 	port := fmt.Sprintf(":%s", env.PORT)
 
 	if err := e.Start(port); err != nil {
