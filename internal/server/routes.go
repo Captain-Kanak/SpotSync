@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 	"spot-sync/internal/config"
+	"spot-sync/internal/domain/reservation"
 	"spot-sync/internal/domain/user"
 	"spot-sync/internal/domain/zone"
 	"spot-sync/internal/httpresponse"
@@ -12,6 +13,7 @@ import (
 )
 
 func Routes(e *echo.Echo, db *gorm.DB, env *config.Env) {
+	// Create enums
 	(func() {
 		db.Exec(`
     		DO $$
@@ -50,9 +52,33 @@ func Routes(e *echo.Echo, db *gorm.DB, env *config.Env) {
     		END
     		$$;
 		`)
+
+		db.Exec(`
+    		DO $$
+    		BEGIN
+        		IF NOT EXISTS (
+            		SELECT 1 FROM pg_type WHERE typname = 'reservation_status'
+        		) THEN
+            		CREATE TYPE reservation_status AS ENUM (
+                		'ACTIVE',
+                		'COMPLETED',
+                		'CANCELED'
+            		);
+        		ELSE
+            		ALTER TYPE reservation_status ADD VALUE IF NOT EXISTS 'ACTIVE';
+            		ALTER TYPE reservation_status ADD VALUE IF NOT EXISTS 'COMPLETED';
+            		ALTER TYPE reservation_status ADD VALUE IF NOT EXISTS 'CANCELED';
+        		END IF;
+    		END
+    		$$;
+		`)
 	})()
 
-	db.AutoMigrate(&user.User{}, &zone.Zone{})
+	db.AutoMigrate(
+		&user.User{},
+		&zone.Zone{},
+		&reservation.Reservation{},
+	)
 
 	e.GET("/", func(c *echo.Context) error {
 		return c.JSON(http.StatusOK, httpresponse.Response{
@@ -61,8 +87,9 @@ func Routes(e *echo.Echo, db *gorm.DB, env *config.Env) {
 		})
 	})
 
-	api := e.Group("/api/v1")
+	apiV1 := e.Group("/api/v1")
 
-	user.Routes(db, api, env)
-	zone.Routes(db, api)
+	user.Routes(db, apiV1, env)
+	zone.Routes(db, apiV1)
+	reservation.Routes(db, apiV1)
 }
