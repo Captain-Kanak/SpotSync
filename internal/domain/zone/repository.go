@@ -1,10 +1,14 @@
 package zone
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	Create(zone *Zone) error
 	GetAll() ([]Zone, error)
+	GetById(id uuid.UUID) (*Zone, error)
 }
 
 type repository struct {
@@ -27,4 +31,14 @@ func (r *repository) GetAll() ([]Zone, error) {
 	}
 
 	return zones, nil
+}
+
+func (r *repository) GetById(id uuid.UUID) (*Zone, error) {
+	zone := &Zone{}
+
+	if err := r.db.Where(&Zone{Id: id}).First(&zone).Error; err != nil {
+		return nil, err
+	}
+
+	return zone, nil
 }

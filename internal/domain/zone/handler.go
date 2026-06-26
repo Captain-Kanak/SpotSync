@@ -6,6 +6,7 @@ import (
 	"spot-sync/internal/domain/zone/dto"
 	"spot-sync/internal/httpresponse"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v5"
 )
 
@@ -73,6 +74,27 @@ func (h *handler) GetAllZones(c *echo.Context) error {
 	return c.JSON(http.StatusOK, httpresponse.Response{
 		Success: true,
 		Message: "Parking zones retrieved successfully",
+		Data:    res,
+	})
+}
+
+func (h *handler) GetZoneById(c *echo.Context) error {
+	id := uuid.MustParse(c.Param("id"))
+
+	res, err := h.service.GetZoneById(id)
+
+	if err != nil {
+		fmt.Println(err)
+
+		return c.JSON(http.StatusBadRequest, httpresponse.Response{
+			Success: false,
+			Message: "Failed to get zone",
+		})
+	}
+
+	return c.JSON(http.StatusOK, httpresponse.Response{
+		Success: true,
+		Message: "Parking zone retrieved successfully",
 		Data:    res,
 	})
 }

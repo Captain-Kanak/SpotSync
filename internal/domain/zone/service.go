@@ -3,6 +3,8 @@ package zone
 import (
 	"fmt"
 	"spot-sync/internal/domain/zone/dto"
+
+	"github.com/google/uuid"
 )
 
 type service struct {
@@ -44,4 +46,14 @@ func (s *service) GetAllZones() ([]dto.ZoneResponse, error) {
 	}
 
 	return res, nil
+}
+
+func (s *service) GetZoneById(id uuid.UUID) (*dto.ZoneResponse, error) {
+	zone, err := s.repo.GetById(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return zone.toResponse(), nil
 }
