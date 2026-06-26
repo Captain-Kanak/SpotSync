@@ -53,5 +53,11 @@ func (u *User) hashPassword(password string) error {
 }
 
 func (u *User) checkPassword(password string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

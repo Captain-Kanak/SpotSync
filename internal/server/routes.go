@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"spot-sync/internal/config"
 	"spot-sync/internal/domain/user"
 	"spot-sync/internal/httpresponse"
 
@@ -9,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Routes(e *echo.Echo, db *gorm.DB) {
+func Routes(e *echo.Echo, db *gorm.DB, env *config.Env) {
 	// (func() {
 	// 	db.Exec(`
 	// 		DO $$
@@ -38,5 +39,5 @@ func Routes(e *echo.Echo, db *gorm.DB) {
 
 	api := e.Group("/api/v1")
 
-	user.Routes(db, api)
+	user.Routes(db, api, env)
 }

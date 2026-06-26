@@ -1,12 +1,15 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"spot-sync/internal/domain/user/dto"
 	"spot-sync/internal/httpresponse"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v5"
+	"gorm.io/gorm"
 )
 
 type handler struct {
@@ -45,6 +48,13 @@ func (h *handler) RegisterUser(c *echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return c.JSON(http.StatusConflict, httpresponse.Response{
+				Success: false,
+				Message: "User already exists",
+			})
+		}
+
 		return c.JSON(http.StatusBadRequest, httpresponse.Response{
 			Success: false,
 			Message: "User registration failed",
@@ -59,8 +69,56 @@ func (h *handler) RegisterUser(c *echo.Context) error {
 }
 
 func (h *handler) LoginUser(c *echo.Context) error {
+	var req dto.LoginRequest
+
+	if err := c.Bind(&req); err != nil {
+		fmt.Println(err)
+
+		return c.JSON(http.StatusBadRequest, httpresponse.Response{
+			Success: false,
+			Message: "Invalid request body",
+			Error:   err.Error(),
+		})
+	}
+
+	if err := c.Validate(&req); err != nil {
+		fmt.Println(err.Error())
+
+		return c.JSON(http.StatusBadRequest, httpresponse.Response{
+			Success: false,
+			Message: "Validation failed!",
+			Error:   err.Error(),
+		})
+	}
+
+	res, err := h.service.LoginUser(req)
+
+	if err != nil {
+		fmt.Println(err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.JSON(http.StatusUnauthorized, httpresponse.Response{
+				Success: false,
+				Message: "Invalid credentials",
+			})
+		}
+
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return c.JSON(http.StatusUnauthorized, httpresponse.Response{
+				Success: false,
+				Message: "Token expired",
+			})
+		}
+
+		return c.JSON(http.StatusBadRequest, httpresponse.Response{
+			Success: false,
+			Message: "Login failed",
+		})
+	}
+
 	return c.JSON(http.StatusOK, httpresponse.Response{
 		Success: true,
 		Message: "Login successful",
+		Data:    res,
 	})
 }
