@@ -3,7 +3,6 @@ package reservation
 import (
 	"spot-sync/internal/auth"
 	"spot-sync/internal/config"
-	"spot-sync/internal/domain/user"
 	"spot-sync/internal/middleware"
 
 	"github.com/labstack/echo/v5"
@@ -16,6 +15,6 @@ func Routes(db *gorm.DB, api *echo.Group, env *config.Env) {
 	handler := NewHandler(service)
 	jwt := auth.NewJWTService(env.JWT_SECRET)
 
-	api.POST("/reservations", handler.ReserveSpot, middleware.AuthMiddleware(jwt),
-		middleware.RequireRole(user.ADMIN, user.DRIVER))
+	api.POST("/reservations", handler.ReserveSpot, middleware.AuthMiddleware(jwt))
+	api.GET("/reservations/my-reservations", handler.GetMyReservations, middleware.AuthMiddleware(jwt))
 }

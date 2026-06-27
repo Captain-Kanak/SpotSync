@@ -27,3 +27,29 @@ func (s *service) ReserveSpot(req *dto.CreateRequest, userId uuid.UUID) (*dto.Re
 
 	return reservation.toResponse(), nil
 }
+
+func (s *service) GetMyReservations(userId uuid.UUID) ([]dto.MyReservationResponse, error) {
+	reservations, err := s.repo.FindByUserId(userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]dto.MyReservationResponse, 0, len(reservations))
+
+	for _, r := range reservations {
+		res = append(res, dto.MyReservationResponse{
+			Id:           r.Id,
+			LicensePlate: r.LicensePlate,
+			Status:       string(r.Status),
+			Zone: dto.ReservationZoneInfo{
+				Id:   r.Zone.Id,
+				Name: r.Zone.Name,
+				Type: string(r.Zone.Type),
+			},
+			CreatedAt: r.CreatedAt,
+		})
+	}
+
+	return res, nil
+}

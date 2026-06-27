@@ -4,12 +4,14 @@ import (
 	"errors"
 	"spot-sync/internal/domain/zone"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 type Repository interface {
 	Create(reservation *Reservation) error
+	FindByUserId(userId uuid.UUID) ([]Reservation, error)
 }
 
 type repository struct {
@@ -29,14 +31,17 @@ func (r *repository) Create(reservation *Reservation) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		var z zone.Zone
 
-		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where(&zone.Zone{Id: reservation.Id}).First(&z).Error; err != nil {
+		if err := tx.
+			Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where(&zone.Zone{Id: reservation.Id}).
+			First(&z).Error; err != nil {
 			return err
 		}
 
 		var activeCount int64
 
-		if err := tx.Model(&Reservation{}).
+		if err := tx.
+			Model(&Reservation{}).
 			Where(&Reservation{ZoneId: z.Id, Status: ACTIVE}).
 			Count(&activeCount).Error; err != nil {
 			return err
@@ -48,7 +53,8 @@ func (r *repository) Create(reservation *Reservation) error {
 
 		var existing int64
 
-		if err := tx.Model(&Reservation{}).
+		if err := tx.
+			Model(&Reservation{}).
 			Where(&Reservation{LicensePlate: reservation.LicensePlate, Status: ACTIVE}).
 			Count(&existing).Error; err != nil {
 			return err
@@ -60,4 +66,18 @@ func (r *repository) Create(reservation *Reservation) error {
 
 		return tx.Create(reservation).Error
 	})
+}
+
+func (r *repository) FindByUserId(userId uuid.UUID) ([]Reservation, error) {
+	var reservations []Reservation
+
+	if err := r.db.
+		Preload("Zone").
+		Where(&Reservation{UserId: userId}).
+		Order("created_at desc").
+		Find(&reservations).Error; err != nil {
+		return nil, err
+	}
+
+	return reservations, nil
 }

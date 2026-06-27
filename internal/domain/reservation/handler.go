@@ -20,8 +20,6 @@ func NewHandler(service *service) *handler {
 	return &handler{service}
 }
 
-
-
 func (h *handler) ReserveSpot(c *echo.Context) error {
 	var req dto.CreateRequest
 
@@ -74,6 +72,32 @@ func (h *handler) ReserveSpot(c *echo.Context) error {
 	return c.JSON(http.StatusOK, httpresponse.Response{
 		Success: true,
 		Message: "Spot reserved successfully",
+		Data:    res,
+	})
+}
+
+func (h *handler) GetMyReservations(c *echo.Context) error {
+	claims, ok := c.Get(middleware.ContextUserKey).(*auth.JWTClaims)
+
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, httpresponse.Response{
+			Success: false,
+			Message: "Unauthorized",
+		})
+	}
+
+	res, err := h.service.GetMyReservations(claims.Id)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, httpresponse.Response{
+			Success: false,
+			Message: "Failed to retrieve reservations",
+		})
+	}
+
+	return c.JSON(http.StatusOK, httpresponse.Response{
+		Success: true,
+		Message: "My reservations retrieved successfully",
 		Data:    res,
 	})
 }
