@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"spot-sync/internal/domain/user/dto"
 	"spot-sync/internal/httpresponse"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v5"
@@ -116,9 +117,21 @@ func (h *handler) LoginUser(c *echo.Context) error {
 		})
 	}
 
+	cookie := &http.Cookie{
+		Name:     "access_token",
+		Value:    res.Token,
+		Path:     "/",
+		Expires:  time.Now().Add(24 * time.Hour),
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	c.SetCookie(cookie)
+
 	return c.JSON(http.StatusOK, httpresponse.Response{
 		Success: true,
 		Message: "Login successful",
-		Data:    res,
+		Data:    res.User,
 	})
 }
