@@ -1,13 +1,15 @@
 package zone
 
 import (
+	"spot-sync/internal/domain/zone/dto"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
 	Create(zone *Zone) error
-	GetAll() ([]Zone, error)
+	FindAllWithAvailability() ([]dto.ZoneWithAvailability, error)
 	GetById(id uuid.UUID) (*Zone, error)
 }
 
@@ -23,10 +25,27 @@ func (r *repository) Create(zone *Zone) error {
 	return r.db.Create(zone).Error
 }
 
-func (r *repository) GetAll() ([]Zone, error) {
-	zones := []Zone{}
+func (r *repository) FindAllWithAvailability() ([]dto.ZoneWithAvailability, error) {
+	var zones []dto.ZoneWithAvailability
 
-	if err := r.db.Find(&zones).Error; err != nil {
+	err := r.db.Model(&Zone{}).
+		Select(`
+			parking_zones.id,
+			parking_zones.name,
+			parking_zones.type,
+			parking_zones.total_capacity,
+			parking_zones.total_capacity - COALESCE((
+				SELECT COUNT(*) FROM reservations
+				WHERE reservations.zone_id = parking_zones.id
+				AND reservations.status = ?
+				AND reservations.deleted_at IS NULL
+			), 0) AS available_spots,
+			parking_zones.price_per_hour,
+			parking_zones.created_at
+		`, "ACTIVE").
+		Find(&zones).Error
+
+	if err != nil {
 		return nil, err
 	}
 

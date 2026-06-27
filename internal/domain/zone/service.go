@@ -1,7 +1,6 @@
 package zone
 
 import (
-	"fmt"
 	"spot-sync/internal/domain/zone/dto"
 
 	"github.com/google/uuid"
@@ -30,19 +29,23 @@ func (s *service) CreateZone(req dto.CreateRequest) (*dto.ZoneResponse, error) {
 	return zone.toResponse(), nil
 }
 
-func (s *service) GetAllZones() ([]dto.ZoneResponse, error) {
-	zones, err := s.repo.GetAll()
-
+func (s *service) GetAllZones() ([]dto.ZoneWithAvailability, error) {
+	zones, err := s.repo.FindAllWithAvailability()
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("Zones result", zones)
-
-	res := make([]dto.ZoneResponse, len(zones))
-
-	for i, zone := range zones {
-		res[i] = *zone.toResponse()
+	res := make([]dto.ZoneWithAvailability, 0, len(zones))
+	for _, z := range zones {
+		res = append(res, dto.ZoneWithAvailability{
+			Id:             z.Id,
+			Name:           z.Name,
+			Type:           z.Type,
+			TotalCapacity:  z.TotalCapacity,
+			AvailableSpots: z.AvailableSpots,
+			PricePerHour:   z.PricePerHour,
+			CreatedAt:      z.CreatedAt,
+		})
 	}
 
 	return res, nil

@@ -35,6 +35,5 @@ func (z *Zone) toResponse() *dto.ZoneResponse {
 		TotalCapacity: z.TotalCapacity,
 		PricePerHour:  z.PricePerHour,
 		CreatedAt:     z.CreatedAt,
-		UpdatedAt:     z.UpdatedAt,
 	}
 }

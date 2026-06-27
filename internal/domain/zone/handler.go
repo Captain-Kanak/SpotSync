@@ -63,11 +63,10 @@ func (h *handler) GetAllZones(c *echo.Context) error {
 	res, err := h.service.GetAllZones()
 
 	if err != nil {
-		fmt.Println(err)
-
-		return c.JSON(http.StatusBadRequest, httpresponse.Response{
+		return c.JSON(http.StatusInternalServerError, httpresponse.Response{
 			Success: false,
-			Message: "Failed to get zones",
+			Message: "Failed to retrieve parking zones",
+			Error:   err.Error(),
 		})
 	}
 
