@@ -12,6 +12,8 @@ import (
 type Repository interface {
 	Create(reservation *Reservation) error
 	FindByUserId(userId uuid.UUID) ([]Reservation, error)
+	FindById(id uuid.UUID) (*Reservation, error)
+	UpdateStatus(id uuid.UUID, status ReservationStatus) error
 }
 
 type repository struct {
@@ -23,8 +25,11 @@ func NewRepository(db *gorm.DB) Repository {
 }
 
 var (
-	ErrZoneFull        = errors.New("zone is fully booked")
-	ErrAlreadyReserved = errors.New("license plate already has an active reservation")
+	ErrZoneFull                = errors.New("zone is fully booked")
+	ErrAlreadyReserved         = errors.New("license plate already has an active reservation")
+	ErrReservationNotFound     = errors.New("reservation not found")
+	ErrNotOwner                = errors.New("you are not allowed to cancel this reservation")
+	ErrInvalidStatusTransition = errors.New("only active reservations can be cancelled")
 )
 
 func (r *repository) Create(reservation *Reservation) error {
@@ -34,7 +39,8 @@ func (r *repository) Create(reservation *Reservation) error {
 		if err := tx.
 			Clauses(clause.Locking{Strength: "UPDATE"}).
 			Where(&zone.Zone{Id: reservation.Id}).
-			First(&z).Error; err != nil {
+			First(&z).
+			Error; err != nil {
 			return err
 		}
 
@@ -43,7 +49,8 @@ func (r *repository) Create(reservation *Reservation) error {
 		if err := tx.
 			Model(&Reservation{}).
 			Where(&Reservation{ZoneId: z.Id, Status: ACTIVE}).
-			Count(&activeCount).Error; err != nil {
+			Count(&activeCount).
+			Error; err != nil {
 			return err
 		}
 
@@ -56,7 +63,8 @@ func (r *repository) Create(reservation *Reservation) error {
 		if err := tx.
 			Model(&Reservation{}).
 			Where(&Reservation{LicensePlate: reservation.LicensePlate, Status: ACTIVE}).
-			Count(&existing).Error; err != nil {
+			Count(&existing).
+			Error; err != nil {
 			return err
 		}
 
@@ -75,9 +83,30 @@ func (r *repository) FindByUserId(userId uuid.UUID) ([]Reservation, error) {
 		Preload("Zone").
 		Where(&Reservation{UserId: userId}).
 		Order("created_at desc").
-		Find(&reservations).Error; err != nil {
+		Find(&reservations).
+		Error; err != nil {
 		return nil, err
 	}
 
 	return reservations, nil
+}
+
+func (r *repository) FindById(id uuid.UUID) (*Reservation, error) {
+	var reservation Reservation
+
+	if err := r.db.
+		Where(&Reservation{Id: id}).
+		First(&reservation).
+		Error; err != nil {
+		return nil, err
+	}
+
+	return &reservation, nil
+}
+
+func (r *repository) UpdateStatus(id uuid.UUID, status ReservationStatus) error {
+	return r.db.
+		Model(&Reservation{}).
+		Where(&Reservation{Id: id}).
+		Update("status", status).Error
 }

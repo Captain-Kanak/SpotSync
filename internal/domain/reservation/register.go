@@ -17,4 +17,5 @@ func Routes(db *gorm.DB, api *echo.Group, env *config.Env) {
 
 	api.POST("/reservations", handler.ReserveSpot, middleware.AuthMiddleware(jwt))
 	api.GET("/reservations/my-reservations", handler.GetMyReservations, middleware.AuthMiddleware(jwt))
+	api.DELETE("/reservations/:id", handler.CancelReservation, middleware.AuthMiddleware(jwt))
 }

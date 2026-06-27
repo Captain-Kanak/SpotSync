@@ -1,9 +1,12 @@
 package reservation
 
 import (
+	"errors"
 	"spot-sync/internal/domain/reservation/dto"
+	"spot-sync/internal/domain/user"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type service struct {
@@ -52,4 +55,26 @@ func (s *service) GetMyReservations(userId uuid.UUID) ([]dto.MyReservationRespon
 	}
 
 	return res, nil
+}
+
+func (s *service) CancelReservation(id uuid.UUID, userId uuid.UUID, role user.UserRole) error {
+	reservation, err := s.repo.FindById(id)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrReservationNotFound
+		}
+
+		return err
+	}
+
+	if role != user.ADMIN && reservation.UserId != userId {
+		return ErrNotOwner
+	}
+
+	if reservation.Status != ACTIVE {
+		return ErrInvalidStatusTransition
+	}
+
+	return s.repo.UpdateStatus(id, CANCELED)
 }
