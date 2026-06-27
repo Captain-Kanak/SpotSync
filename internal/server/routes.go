@@ -91,5 +91,5 @@ func Routes(e *echo.Echo, db *gorm.DB, env *config.Env) {
 
 	user.Routes(db, apiV1, env)
 	zone.Routes(db, apiV1, env)
-	reservation.Routes(db, apiV1)
+	reservation.Routes(db, apiV1, env)
 }

@@ -21,9 +21,7 @@ func (s *service) ReserveSpot(req *dto.CreateRequest, userId uuid.UUID) (*dto.Re
 		LicensePlate: req.LicensePlate,
 	}
 
-	err := s.repo.Create(reservation)
-
-	if err != nil {
+	if err := s.repo.Create(reservation); err != nil {
 		return nil, err
 	}
 

@@ -17,7 +17,7 @@ func Routes(db *gorm.DB, api *echo.Group, env *config.Env) {
 	jwt := auth.NewJWTService(env.JWT_SECRET)
 
 	api.POST("/zones", handler.CreateZone, middleware.AuthMiddleware(jwt),
-		middleware.RequireRole(user.UserRole("ADMIN")))
+		middleware.RequireRole(user.ADMIN))
 	api.GET("/zones", handler.GetAllZones)
 	api.GET("/zones/:id", handler.GetZoneById)
 }
