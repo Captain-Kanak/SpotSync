@@ -51,12 +51,22 @@ func (s *service) GetAllZones() ([]dto.ZoneWithAvailability, error) {
 	return res, nil
 }
 
-func (s *service) GetZoneById(id uuid.UUID) (*dto.ZoneResponse, error) {
-	zone, err := s.repo.GetById(id)
+func (s *service) GetZoneById(id uuid.UUID) (*dto.ZoneWithAvailability, error) {
+	zone, err := s.repo.FindByIdWithAvailability(id)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return zone.toResponse(), nil
+	res := &dto.ZoneWithAvailability{
+		Id:             zone.Id,
+		Name:           zone.Name,
+		Type:           zone.Type,
+		TotalCapacity:  zone.TotalCapacity,
+		AvailableSpots: zone.AvailableSpots,
+		PricePerHour:   zone.PricePerHour,
+		CreatedAt:      zone.CreatedAt,
+	}
+
+	return res, nil
 }

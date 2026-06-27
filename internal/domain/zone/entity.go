@@ -29,11 +29,12 @@ type Zone struct {
 
 func (z *Zone) toResponse() *dto.ZoneResponse {
 	return &dto.ZoneResponse{
-		Id:            z.Id,
-		Name:          z.Name,
-		Type:          string(z.Type),
-		TotalCapacity: z.TotalCapacity,
-		PricePerHour:  z.PricePerHour,
-		CreatedAt:     z.CreatedAt,
+		Id:             z.Id,
+		Name:           z.Name,
+		Type:           string(z.Type),
+		TotalCapacity:  z.TotalCapacity,
+		AvailableSpots: z.TotalCapacity,
+		PricePerHour:   z.PricePerHour,
+		CreatedAt:      z.CreatedAt,
 	}
 }

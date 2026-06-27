@@ -10,7 +10,7 @@ import (
 type Repository interface {
 	Create(zone *Zone) error
 	FindAllWithAvailability() ([]dto.ZoneWithAvailability, error)
-	GetById(id uuid.UUID) (*Zone, error)
+	FindByIdWithAvailability(id uuid.UUID) (*dto.ZoneWithAvailability, error)
 }
 
 type repository struct {
@@ -28,20 +28,20 @@ func (r *repository) Create(zone *Zone) error {
 func (r *repository) FindAllWithAvailability() ([]dto.ZoneWithAvailability, error) {
 	var zones []dto.ZoneWithAvailability
 
-	err := r.db.Model(&Zone{}).
+	err := r.db.Table("zones AS z").
 		Select(`
-			parking_zones.id,
-			parking_zones.name,
-			parking_zones.type,
-			parking_zones.total_capacity,
-			parking_zones.total_capacity - COALESCE((
-				SELECT COUNT(*) FROM reservations
-				WHERE reservations.zone_id = parking_zones.id
-				AND reservations.status = ?
-				AND reservations.deleted_at IS NULL
+			z.id,
+			z.name,
+			z.type,
+			z.total_capacity,
+			z.total_capacity - COALESCE((
+				SELECT COUNT(*) FROM reservations r
+				WHERE r.zone_id = z.id
+				AND r.status = ?
+				AND r.deleted_at IS NULL
 			), 0) AS available_spots,
-			parking_zones.price_per_hour,
-			parking_zones.created_at
+			z.price_per_hour,
+			z.created_at
 		`, "ACTIVE").
 		Find(&zones).Error
 
@@ -52,12 +52,30 @@ func (r *repository) FindAllWithAvailability() ([]dto.ZoneWithAvailability, erro
 	return zones, nil
 }
 
-func (r *repository) GetById(id uuid.UUID) (*Zone, error) {
-	zone := &Zone{}
+func (r *repository) FindByIdWithAvailability(id uuid.UUID) (*dto.ZoneWithAvailability, error) {
+	var zone dto.ZoneWithAvailability
 
-	if err := r.db.Where(&Zone{Id: id}).First(&zone).Error; err != nil {
+	err := r.db.Table("zones AS z").
+		Select(`
+			z.id,
+			z.name,
+			z.type,
+			z.total_capacity,
+			z.total_capacity - COALESCE((
+				SELECT COUNT(*) FROM reservations r
+				WHERE r.zone_id = z.id
+				AND r.status = ?
+				AND r.deleted_at IS NULL
+			), 0) AS available_spots,
+			z.price_per_hour,
+			z.created_at
+		`, "ACTIVE").
+		Where("z.id = ?", id).
+		First(&zone).Error
+
+	if err != nil {
 		return nil, err
 	}
 
-	return zone, nil
+	return &zone, nil
 }
