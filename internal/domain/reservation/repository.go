@@ -14,6 +14,7 @@ type Repository interface {
 	FindByUserId(userId uuid.UUID) ([]Reservation, error)
 	FindById(id uuid.UUID) (*Reservation, error)
 	UpdateStatus(id uuid.UUID, status ReservationStatus) error
+	GetAll() ([]Reservation, error)
 }
 
 type repository struct {
@@ -109,4 +110,18 @@ func (r *repository) UpdateStatus(id uuid.UUID, status ReservationStatus) error 
 		Model(&Reservation{}).
 		Where(&Reservation{Id: id}).
 		Update("status", status).Error
+}
+
+func (r *repository) GetAll() ([]Reservation, error) {
+	var reservations []Reservation
+
+	if err := r.db.
+		Preload("Zone").
+		Order("created_at desc").
+		Find(&reservations).
+		Error; err != nil {
+		return nil, err
+	}
+
+	return reservations, nil
 }

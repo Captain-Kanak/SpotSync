@@ -78,3 +78,19 @@ func (s *service) CancelReservation(id uuid.UUID, userId uuid.UUID, role user.Us
 
 	return s.repo.UpdateStatus(id, CANCELED)
 }
+
+func (s *service) GetAllReservations() ([]dto.ReservationResponse, error) {
+	reservations, err := s.repo.GetAll()
+
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]dto.ReservationResponse, 0, len(reservations))
+
+	for _, r := range reservations {
+		res = append(res, *r.toResponse())
+	}
+
+	return res, nil
+}
