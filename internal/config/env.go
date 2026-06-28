@@ -7,9 +7,11 @@ import (
 )
 
 type Env struct {
-	PORT       string
-	DSN        string
-	JWT_SECRET string
+	ENV          string
+	PORT         string
+	DSN          string
+	JWT_SECRET   string
+	FRONTEND_URL string
 }
 
 func LoadEnv() *Env {
@@ -20,8 +22,10 @@ func LoadEnv() *Env {
 	}
 
 	return &Env{
-		PORT:       os.Getenv("PORT"),
-		DSN:        os.Getenv("DSN"),
-		JWT_SECRET: os.Getenv("JWT_SECRET"),
+		ENV:          os.Getenv("ENV"),
+		PORT:         os.Getenv("PORT"),
+		DSN:          os.Getenv("DSN"),
+		JWT_SECRET:   os.Getenv("JWT_SECRET"),
+		FRONTEND_URL: os.Getenv("FRONTEND_URL"),
 	}
 }
