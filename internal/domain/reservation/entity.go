@@ -42,3 +42,37 @@ func (r *Reservation) toResponse() *dto.ReservationResponse {
 		UpdatedAt:    r.UpdatedAt,
 	}
 }
+
+func (r *Reservation) toMyResponse() *dto.MyReservationResponse {
+	return &dto.MyReservationResponse{
+		Id:           r.Id,
+		LicensePlate: r.LicensePlate,
+		Status:       string(r.Status),
+		Zone: dto.ZoneInfo{
+			Id:   r.Zone.Id,
+			Name: r.Zone.Name,
+			Type: string(r.Zone.Type),
+		},
+		CreatedAt: r.CreatedAt,
+	}
+}
+
+func (r *Reservation) toAdminResponse() *dto.AdminReservationResponse {
+	return &dto.AdminReservationResponse{
+		Id:           r.Id,
+		LicensePlate: r.LicensePlate,
+		Status:       string(r.Status),
+		User: dto.UserInfo{
+			Id:    r.User.Id,
+			Name:  r.User.Name,
+			Email: r.User.Email,
+		},
+		Zone: dto.ZoneInfo{
+			Id:   r.Zone.Id,
+			Name: r.Zone.Name,
+			Type: string(r.Zone.Type),
+		},
+		CreatedAt: r.CreatedAt,
+		UpdatedAt: r.UpdatedAt,
+	}
+}

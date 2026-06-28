@@ -116,6 +116,7 @@ func (r *repository) GetAll() ([]Reservation, error) {
 	var reservations []Reservation
 
 	if err := r.db.
+		Preload("User").
 		Preload("Zone").
 		Order("created_at desc").
 		Find(&reservations).

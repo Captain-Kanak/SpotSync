@@ -132,6 +132,6 @@ func (h *handler) LoginUser(c *echo.Context) error {
 	return c.JSON(http.StatusOK, httpresponse.Response{
 		Success: true,
 		Message: "Login successful",
-		Data:    res.User,
+		Data:    res,
 	})
 }

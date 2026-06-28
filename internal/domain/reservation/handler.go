@@ -71,7 +71,7 @@ func (h *handler) ReserveSpot(c *echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, httpresponse.Response{
+	return c.JSON(http.StatusCreated, httpresponse.Response{
 		Success: true,
 		Message: "Spot reserved successfully",
 		Data:    res,

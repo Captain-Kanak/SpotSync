@@ -45,7 +45,7 @@ func (s *service) GetMyReservations(userId uuid.UUID) ([]dto.MyReservationRespon
 			Id:           r.Id,
 			LicensePlate: r.LicensePlate,
 			Status:       string(r.Status),
-			Zone: dto.ReservationZoneInfo{
+			Zone: dto.ZoneInfo{
 				Id:   r.Zone.Id,
 				Name: r.Zone.Name,
 				Type: string(r.Zone.Type),
@@ -79,17 +79,17 @@ func (s *service) CancelReservation(id uuid.UUID, userId uuid.UUID, role user.Us
 	return s.repo.UpdateStatus(id, CANCELED)
 }
 
-func (s *service) GetAllReservations() ([]dto.ReservationResponse, error) {
+func (s *service) GetAllReservations() ([]dto.AdminReservationResponse, error) {
 	reservations, err := s.repo.GetAll()
 
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]dto.ReservationResponse, 0, len(reservations))
+	res := make([]dto.AdminReservationResponse, 0, len(reservations))
 
 	for _, r := range reservations {
-		res = append(res, *r.toResponse())
+		res = append(res, *r.toAdminResponse())
 	}
 
 	return res, nil

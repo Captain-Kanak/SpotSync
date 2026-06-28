@@ -20,4 +20,6 @@ func Routes(db *gorm.DB, api *echo.Group, env *config.Env) {
 		middleware.RequireRole(user.ADMIN))
 	api.GET("/zones", handler.GetAllZones)
 	api.GET("/zones/:id", handler.GetZoneById)
+	api.PATCH("/zones/:id", handler.UpdateZone, middleware.AuthMiddleware(jwt), middleware.RequireRole(user.ADMIN))
+	api.DELETE("/zones/:id", handler.DeleteZone, middleware.AuthMiddleware(jwt), middleware.RequireRole(user.ADMIN))
 }
