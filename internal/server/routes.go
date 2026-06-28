@@ -22,12 +22,12 @@ func Routes(e *echo.Echo, db *gorm.DB, env *config.Env) {
             		SELECT 1 FROM pg_type WHERE typname = 'user_role'
         		) THEN
             		CREATE TYPE user_role AS ENUM (
-                		'ADMIN',
-                		'DRIVER'
+                		'admin',
+                		'driver'
             		);
         		ELSE
-            		ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'ADMIN';
-            		ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'DRIVER';
+            		ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'admin';
+            		ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'driver';
         		END IF;
     		END
     		$$;
@@ -40,14 +40,14 @@ func Routes(e *echo.Echo, db *gorm.DB, env *config.Env) {
             		SELECT 1 FROM pg_type WHERE typname = 'zone_type'
         		) THEN
             		CREATE TYPE zone_type AS ENUM (
-                		'GENERAL',
-                		'EV_CHARGING',
-                		'COVERED'
+                		'general',
+                		'ev_charging',
+                		'covered'
             		);
         		ELSE
-            		ALTER TYPE zone_type ADD VALUE IF NOT EXISTS 'GENERAL';
-            		ALTER TYPE zone_type ADD VALUE IF NOT EXISTS 'EV_CHARGING';
-            		ALTER TYPE zone_type ADD VALUE IF NOT EXISTS 'COVERED';
+            		ALTER TYPE zone_type ADD VALUE IF NOT EXISTS 'general';
+            		ALTER TYPE zone_type ADD VALUE IF NOT EXISTS 'ev_charging';
+            		ALTER TYPE zone_type ADD VALUE IF NOT EXISTS 'covered';
         		END IF;
     		END
     		$$;

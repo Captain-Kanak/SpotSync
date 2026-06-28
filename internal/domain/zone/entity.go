@@ -11,15 +11,15 @@ import (
 type ZoneType string
 
 const (
-	GENERAL     ZoneType = "GENERAL"
-	EV_CHARGING ZoneType = "EV_CHARGING"
-	COVERED     ZoneType = "COVERED"
+	GENERAL     ZoneType = "general"
+	EV_CHARGING ZoneType = "ev_charging"
+	COVERED     ZoneType = "covered"
 )
 
 type Zone struct {
 	Id            uuid.UUID      `json:"id" gorm:"type:uuid;default:gen_random_uuid();primary_key"`
 	Name          string         `json:"name" gorm:"type:varchar(255);not null"`
-	Type          ZoneType       `json:"type" gorm:"type:zone_type;default:'GENERAL';not null"`
+	Type          ZoneType       `json:"type" gorm:"type:zone_type;default:'general';not null"`
 	TotalCapacity int            `json:"total_capacity" gorm:"type:int;not null"`
 	PricePerHour  float64        `json:"price_per_hour" gorm:"type:float;not null"`
 	CreatedAt     time.Time      `json:"created_at" gorm:"type:timestamp"`

@@ -12,8 +12,8 @@ import (
 type UserRole string
 
 const (
-	ADMIN  UserRole = "ADMIN"
-	DRIVER UserRole = "DRIVER"
+	ADMIN  UserRole = "admin"
+	DRIVER UserRole = "driver"
 )
 
 type User struct {
@@ -21,7 +21,7 @@ type User struct {
 	Name      string         `json:"name" gorm:"type:varchar(255);not null"`
 	Email     string         `json:"email" gorm:"type:varchar(255);unique;not null"`
 	Password  string         `json:"-" gorm:"type:text;not null"`
-	Role      UserRole       `json:"role" gorm:"type:user_role;default:'DRIVER';not null"`
+	Role      UserRole       `json:"role" gorm:"type:user_role;default:'driver';not null"`
 	Phone     string         `json:"phone" gorm:"type:varchar(20)"`
 	CreatedAt time.Time      `json:"created_at" gorm:"type:timestamp"`
 	UpdatedAt time.Time      `json:"updated_at" gorm:"type:timestamp"`
