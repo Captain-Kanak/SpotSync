@@ -1,71 +1,94 @@
-# 🌱 EcoSpark-Hub – SERVER
+# 🚗 SpotSync – SERVER
 
-A high-integrity, multi-role backend built for a specialized Environmental Innovation Marketplace. This system enables Admins to curate eco-categories, Innovators to list sustainable solutions, and Supporters to fund projects and leave impact reviews with real-time tracking of project availability.
+A high-performance backend service built with Go, Echo, GORM, and PostgreSQL for managing parking reservations and EV charging stations. The platform enables drivers to reserve parking spaces while allowing administrators to manage parking zones, pricing, and reservations through a secure role-based system.
 
-<!-- - **[LIVE LINK](https://eco-spark-hub-client.vercel.app)** -->
-<!-- - **[CLIENT REPOSITORY](https://github.com/Captain-Kanak/eco-spark-hub-client)** -->
+<!-- - **[LIVE LINK](https://)** -->
+<!-- - **[CLIENT REPOSITORY](https://github.com/Captain-Kanak/)** -->
 
 ---
 
 ## 📌 Overview
 
-This backend system powers a structured environmental incubator:
+SpotSync is a centralized parking management system designed for environments with limited parking capacity such as airports, shopping malls, and commercial complexes.
 
-- Unified Authentication: Powered by Better Auth for secure, session-based identity management.
-- Role-Based Access Control (RBAC): Distinct permissions for ADMIN and MEMBER.
-- Innovation Taxonomy: Only Admins can define the global environmental sectors (Categories).
-- Project Inventory: Innovators (MEMBER) manage their own project blueprints, funding goals, and pricing.
-- Transactional Funding: Atomic "Impact Purchase" process using Prisma Transactions to ensure data integrity between orders and project availability.
-- Clean Architecture: Modular service-controller pattern built with TypeScript and Express.
+The backend provides:
+
+- Secure JWT Authentication
+- Role-Based Access Control (Driver & Admin)
+- Parking Zone Management
+- EV Charging Reservation System
+- Concurrency-safe Reservation Processing
+- Transactional Database Operations
+- Clean Architecture with Dependency Injection
+
+The system guarantees that parking zones never exceed their configured capacity, even when multiple users attempt to reserve the last available space simultaneously.
 
 ---
 
 ## 🛠 Technology Stack
 
-- Runtime: Node.js
-- Language: TypeScript
-- Framework: Express.js
+- Language: GO
+- Framework: Echo
 - Database: PostgreSQL (Neon DB)
-- ORM: Prisma
-- Authentication: Better Auth & JWT
+- ORM: GORM
+- Authentication: JWT
 
 ---
 
 ## 🔐 Authentication & Authorization
 
-### Better Auth Integration
+### Authentication is implemented using JWT.
 
-The system utilizes Better Auth for modern security:
+After successful login:
 
-- Session Management: Secure server-side sessions.
-- Role Injection: User roles are baked into the session metadata for low-latency authorization.
-- Cross-Origin Security: Built-in protection against CSRF and session hijacking.
+- Server generates a signed JWT
+- Client stores the token
+- Protected routes require:
+
+Authorization: Bearer <JWT_TOKEN>
 
 ### Role-Based Access Control (RBAC)
 
-- ADMIN – Manage Eco-Categories, Global User Audit, Platform Analytics, Inventory Oversight.
-- MEMBER – Create/Update/Delete own Ideas, Track Sales/Funding, Manage Project Status.
+- ADMIN – Create, update, and delete parking zones, configure pricing, view all reservations, and manage overall parking operations.
+- DRIVER – Register and log in, browse parking zones and real-time availability, reserve parking or EV charging spots, view personal reservations, and cancel their own reservations.
 
 ---
 
 ## 🔒 Security Considerations
 
-- Atomic Transactions: Project capacity is adjusted using prisma.$transaction to prevent over-funding beyond project limits.
-- Price Integrity: Contribution totals are validated against the DB to prevent frontend price manipulation.
-- Unique Constraints: @@unique([name, categoryId]) prevents duplicate innovation entries within the same sector.
-- Security Headers: Better Auth handles secure cookie management and session validation.
+The application includes several security mechanisms:
+
+- Passwords are hashed using bcrypt.
+- JWT is used for stateless authentication.
+- Request validation prevents invalid payloads.
+- Protected routes require authentication.
+- Role verification prevents unauthorized actions.
+- Sensitive fields (passwords) are never returned in API responses.
+
+### Concurrency-safe Reservation
+
+Parking reservation is implemented using:
+
+- Database Transactions
+- Row-Level Locking (FOR UPDATE)
+
+This prevents race conditions when multiple users reserve the last available parking spot simultaneously.
 
 ---
 
 ## 🗄️ Database Schema
 
-- **[Details](https://github.com/Captain-Kanak/eco-spark-hub-server/blob/main/DATABASE.md)**
+Detailed database schema is available here:
+
+- **[DATABASE.md](https://github.com/Captain-Kanak/SpotSync/blob/main/DATABASE.md)**
 
 ---
 
 ## 🔗 API Endpoints
 
-- **[Details](https://github.com/Captain-Kanak/eco-spark-hub-server/blob/main/API_DOCS.md)**
+Complete API documentation is available here:
+
+- **[API_DOCS.md](https://github.com/Captain-Kanak/SpotSync/blob/main/API_DOCS.md)**
 
 ---
 
@@ -73,56 +96,32 @@ The system utilizes Better Auth for modern security:
 
 Prerequisites:
 
-- Node.js (v20.19+)
+- Go 1.22+
 - PostgreSQL / (Neon DB)
-- pnpm
+- Git
 
 Clone Repository:
 
 ```bash
-git clone https://github.com/Captain-Kanak/eco-spark-hub-server
-cd eco-spark-hub-server
+git clone https://github.com/Captain-Kanak/SpotSync
+cd SpotSync
 ```
 
 Install Dependencies:
 
 ```bash
-pnpm install
+go mod tidy
 ```
 
 Environment Variables:
 Create a `.env` file in the root of your project and add the following:
 
 ```env
-NODE_ENV="development"
-PORT="5000"
-DATABASE_URL='database-url'
+ENV="development"
+PORT="8080"
+DSN='database-source-name'
 FRONTEND_URL="http://localhost:3000"
-BETTER_AUTH_URL="http://localhost:5000"
-BETTER_AUTH_SECRET="better-auth-secret"
-BETTER_AUTH_SESSION_EXPIRES_IN="1d"
-BETTER_AUTH_SESSION_UPDATE_AGE="7 days"
-EMAIL_SENDER_SMTP_USER="email-sender-smtp-user"
-EMAIL_SENDER_SMTP_PASS="email-sender-smtp-pass"
-EMAIL_SENDER_SMTP_HOST="smtp.gmail.com"
-EMAIL_SENDER_SMTP_PORT="465"
-EMAIL_SENDER_SMTP_FROM="Eco Spark Hub <email-sender-smtp-user>"
-STRIPE_SECRET_KEY="stripe-secret-key"
-GOOGLE_CLIENT_ID="google-client-id"
-GOOGLE_CLIENT_SECRET="google-client-secret"
-GOOGLE_CALLBACK_URL="http://localhost:5000/api/auth/callback/google"
-CLOUDINARY_CLOUD_NAME="cloudinary-cloud-name"
-CLOUDINARY_API_KEY="cloudinary-api-key"
-CLOUDINARY_API_SECRET="cloudinary-api-secret"
-```
-
----
-
-Run Prisma:
-
-```bash
-npx prisma migrate dev
-npx prisma generate
+JWT_SECRET="jwt-secret"
 ```
 
 ---
@@ -130,7 +129,7 @@ npx prisma generate
 Start Server:
 
 ```bash
-pnpm dev
+go run cmd/main.go
 ```
 
 ---
@@ -139,12 +138,17 @@ pnpm dev
 
 - Kanak Ray
 - Software Engineer
-- (TypeScript | Express.js | PostgreSQL | Docker | GO | Echo)
+- TypeScript
+- Express.js
+- PostgreSQL
+- Docker
+- GO
+- Echo
 
 ---
 
 ## 📄 License
 
-This project is intended for educational and demonstration purposes.
+This project was developed for educational and demonstration purposes.
 
-> This README file was initially generated with AI assistance and has been reviewed, customized, and modified by me to accurately reflect the project's implementation, features, and documentation.
+> This README file was initially generated with AI assistance and has been reviewed, customized, and modified by me to accurately reflect the project's implementation, architecture, and documentation.
