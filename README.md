@@ -137,7 +137,8 @@ go run cmd/main.go
 ## 👤 Author
 
 **Kanak Ray**
-Software Engineer
+
+> Software Engineer
 
 - TypeScript
 - Express.js
