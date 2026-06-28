@@ -136,8 +136,9 @@ go run cmd/main.go
 
 ## 👤 Author
 
-- Kanak Ray
-- Software Engineer
+**Kanak Ray**
+Software Engineer
+
 - TypeScript
 - Express.js
 - PostgreSQL
