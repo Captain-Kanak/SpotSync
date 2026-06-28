@@ -18,6 +18,7 @@ func (s *service) RegisterUser(req dto.CreateRequest) (*dto.UserResponse, error)
 	user := &User{
 		Name:  req.Name,
 		Email: req.Email,
+		Role:  UserRole(req.Role),
 	}
 
 	if err := user.hashPassword(req.Password); err != nil {
