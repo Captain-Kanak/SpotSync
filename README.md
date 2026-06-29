@@ -120,8 +120,8 @@ Create a `.env` file in the root of your project and add the following:
 ENV="development"
 PORT="8080"
 DSN='database-source-name'
-FRONTEND_URL="http://localhost:3000"
 JWT_SECRET="jwt-secret"
+FRONTEND_URL="http://localhost:3000"
 ```
 
 ---

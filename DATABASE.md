@@ -1,74 +1,43 @@
 # 🗄️ Database Schema
 
-**[ERD LINK](https://drive.google.com/file/d/1j3ANDqFYj20Nu6VDs8lQYnDMitSW76Z5/view)**
+<!-- **[ERD LINK](https://)** -->
 
 ### User
 
-| Field         | Description       |
-| ------------- | ----------------- |
-| id            | UUID (PK)         |
-| name          | String            |
-| email         | String (unique)   |
-| emailVerified | Boolean (false)   |
-| image         | String?           |
-| role          | ADMIN / MEMBER    |
-| status        | ACTIVE / DEACTIVE |
-| phone         | String?           |
-| address       | String?           |
-| date_of_birth | DateTime?         |
-| isDeleted     | Boolean (false)   |
-| deletedAt     | DateTime?         |
-| createdAt     | DateTime (now())  |
-| updatedAt     | DateTime          |
+| Field     | Description     |
+| --------- | --------------- |
+| id        | UUID (PK)       |
+| name      | String          |
+| email     | String (unique) |
+| password  | String          |
+| role      | admin / driver  |
+| phone     | String?         |
+| createdAt | DateTime        |
+| updatedAt | DateTime        |
+| deletedAt | DateTime?       |
 
-### Category
+### Zone
 
-| Field       | Description      |
-| ----------- | ---------------- |
-| id          | UUID (PK)        |
-| name        | String (unique)  |
-| icon        | String?          |
-| description | String?          |
-| isDeleted   | Boolean (false)  |
-| deletedAt   | DateTime?        |
-| createdAt   | DateTime (now()) |
-| updatedAt   | DateTime         |
+| Field          | Description                     |
+| -------------- | ------------------------------- |
+| id             | UUID (PK)                       |
+| name           | String                          |
+| type           | general / ev_charging / covered |
+| total_capacity | Int                             |
+| price_per_hour | float64                         |
+| createdAt      | DateTime                        |
+| updatedAt      | DateTime                        |
+| deletedAt      | DateTime?                       |
 
-### Idea
+### Reservation
 
-| Field            | Description                   |
-| ---------------- | ----------------------------- |
-| id               | UUID (PK)                     |
-| title            | String (unique)               |
-| description      | String                        |
-| problemStatement | String                        |
-| solution         | String                        |
-| image            | String?                       |
-| isPaid           | Boolean (false)               |
-| price            | Float?                        |
-| status           | PENDING / APPROVED / REJECTED |
-| adminFeedback    | String?                       |
-| upvotes          | Int                           |
-| downvotes        | Int                           |
-| categoryId       | String (FK)                   |
-| userId           | String (FK)                   |
-| isDeleted        | Boolean (false)               |
-| deletedAt        | DateTime?                     |
-| createdAt        | DateTime (now())              |
-| updatedAt        | DateTime                      |
-
-### Payment
-
-| Field         | Description      |
-| ------------- | ---------------- |
-| id            | UUID (PK)        |
-| amount        | Float            |
-| transactionId | String           |
-| status        | PAID / UNPAID    |
-| paymentMethod | String           |
-| ideaId        | String (FK)      |
-| userId        | String (FK)      |
-| isDeleted     | Boolean (false)  |
-| deletedAt     | DateTime?        |
-| createdAt     | DateTime (now()) |
-| updatedAt     | DateTime         |
+| Field         | Description                   |
+| ------------- | ----------------------------- |
+| id            | UUID (PK)                     |
+| userId        | UUID (FK)                     |
+| zone_id       | UUID (FK)                     |
+| license_plate | String                        |
+| Status        | ACTIVE / COMPLETED / CANCELED |
+| createdAt     | DateTime                      |
+| updatedAt     | DateTime                      |
+| deletedAt     | DateTime?                     |
